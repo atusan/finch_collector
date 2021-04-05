@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h1>Art Details</h1>
+
+<div class="card">
+  <div class="card-content">
+    <span class="card-title">{{ art.name }}</span>
+    <p> type: {{ art.type  }}</p>
+    <p>date: {{ art.date }}</p>
+  </div>
+  <div class="card-action">
+    <a href="{% url 'arts_update' art.id %}">Edit</a>
+    <a href="{% url 'arts_delete' art.id %}">Delete</a>
+  </div>
+</div>
+<div class="col s6">
+  <form action="{% url 'add_feeding' art.id %}" method="post">
+    {% csrf_token %}
+    {{ feeding_form.as_p }}
+    <input type="submit" class="btn" value="Add Task">
+  </form>
+  <table class="striped">
+    <thead>
+      <tr><th>Date</th><th>Task</th></tr>
+    </thead>
+    <tbody>
+      {% for feeding in art.feeding_set.all %}
+        <tr>
+          <td>{{feeding.date}}</td>
+          <td>{{feeding.get_meal_display}}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+<hr>
+<div class="row">
+  <div class="col s6">
+    <h3>{{ art.name }}'s Locations</h3>
+    {% if art.locations.count %}
+      {% for loc in art.locations.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span>{{ loc.date }}</span> {{ loc.address }}
+            </span>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>No Locations :(</h5>
+    {% endif %}
+  </div>
+  <!-- Available toys will come after this line -->
+  <div class="col s6">
+    <h3>Available Locations</h3>
+    {% if locations.count %}
+      {% for loca in locations.all %}
+        <div class="card">
+          <div class="card-content">
+            <span class="card-title">
+              A <span>{{ loc.date }}</span> {{ loc.address }}
+            </span>
+          </div>
+          <div class="card-action">
+            <form action="{% url 'assoc_location' art.id location.id %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn">Add</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <h5>{{art.name}} Already Has All Locs Available</h5>
+    {% endif %}
+  </div>
+</div>
+</div>
+<script>
+  // create a datepicker
+  var dateEl = document.getElementById('id_date');
+  M.Datepicker.init(dateEl, {
+    format: 'yyyy-mm-dd',
+    defaultDate: new Date(),
+    setDefaultDate: true,
+    autoClose: true
+  });
+  // initialize the meal select
+  var selectEl = document.getElementById('id_meal');
+  M.FormSelect.init(selectEl);
+</script>
+{% endblock %}
+
